@@ -1,6 +1,7 @@
 // src/contexts/UserContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export const UserContext = createContext(null);
 
@@ -82,11 +83,8 @@ export const UserProvider = ({ children, userId, isLoggedIn }) => { // <--- Adic
 
   return (
     <UserContext.Provider value={contextValue}>
-      {/* Opcional: Você pode manter um loading global aqui */}
       {loadingUser && !user && (
-         <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
-           <p className="text-primary-dark font-accent text-lg">Carregando informações do usuário...</p>
-         </div>
+        <LoadingSpinner message="Carregando perfil do usuário..." />
       )}
       {children}
     </UserContext.Provider>

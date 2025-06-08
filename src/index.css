@@ -26,3 +26,12 @@ body {
 .navbar {
     background-color: #002147; /* Exemplo: você pode usar valores diretos aqui */
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  scrollbar-width: none; /* For Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -46,12 +46,10 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        validateStatus: () => true, // Não lança erro para status diferentes de 2xx
+        validateStatus: () => true,
       });
 
       if (response.status === 200 && response.data?.token) {
-        // Armazenamento local (opcional, já que o Context vai gerenciar o estado)
-        // Você pode remover estas linhas de localStorage/sessionStorage se o Context for a única fonte
         if (form.manterConectado) {
           localStorage.setItem("token", response.data.token);
         } else {
@@ -60,13 +58,10 @@ export default function Login() {
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("userId", response.data.id);
         localStorage.setItem("userGUID", response.data.guid);
-        localStorage.setItem("userName", response.data.name); // Certifique-se que sua API retorna o nome
 
         // Chame a função de login do contexto para atualizar o estado global
         authLogin({
           token: response.data.token,
-          name: response.data.name, // Ajuste para o nome da propriedade na sua API
-          avatar: response.data.avatar || null, // Ajuste para a URL do avatar da sua API
           guid: response.data.guid,
           role: response.data.role,
         });
@@ -77,7 +72,6 @@ export default function Login() {
         });
 
         setTimeout(() => {
-          // Redireciona conforme o tipo de usuário e o GUID
           if (response.data.role === "usuario") {
             navigate(`/usuario/meu-perfil/${response.data.guid}`);
           } else if (response.data.role === "instituicao") {

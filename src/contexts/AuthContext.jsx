@@ -10,9 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [userGuid, setUserGuid] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
-  // REMOVIDO: Acesso às funções do UserContext
-  // const { saveUserData, clearUserData: clearUserProfileData, loadingUser: loadingUserProfile } = useUser();
-
   // Efeito para carregar dados de autenticação do localStorage ao montar o componente
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -23,10 +20,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(true);
       setUserGuid(storedUserGuid);
       setUserRole(storedUserRole);
-      // NÃO CHAME saveUserData/clearUserProfileData aqui
-      // O UserContext fará sua própria inicialização ou receberá props do AppContent
     }
-  }, []); // Sem dependências para funções do UserContext
+  }, []);
 
   // Função para efetuar login
   const login = (loginData) => {
