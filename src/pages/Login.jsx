@@ -5,11 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, HandHeart, Building } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Alert } from "../components/Alert";
+import { Alert } from "../components/Alert"; // Certifique-se de que o caminho está correto
 import axios from "axios";
+import { useAuth } from '../contexts/AuthContext'; 
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login: authLogin, isLoggedIn: contextIsLoggedIn, userGuid: contextUserGuid, userRole: contextUserRole } = useAuth();
+
   const [alert, setAlert] = React.useState(null);
   const [userType, setUserType] = useState("usuario");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,19 +46,30 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        validateStatus: () => true,
+        validateStatus: () => true, // Não lança erro para status diferentes de 2xx
       });
 
       if (response.status === 200 && response.data?.token) {
+        // Armazenamento local (opcional, já que o Context vai gerenciar o estado)
+        // Você pode remover estas linhas de localStorage/sessionStorage se o Context for a única fonte
         if (form.manterConectado) {
           localStorage.setItem("token", response.data.token);
         } else {
           sessionStorage.setItem("token", response.data.token);
         }
-        localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("userId", response.data.id);
-        localStorage.setItem("userGUID", response.data.GUID);
+        localStorage.setItem("userGUID", response.data.guid);
+        localStorage.setItem("userName", response.data.name); // Certifique-se que sua API retorna o nome
+
+        // Chame a função de login do contexto para atualizar o estado global
+        authLogin({
+          token: response.data.token,
+          name: response.data.name, // Ajuste para o nome da propriedade na sua API
+          avatar: response.data.avatar || null, // Ajuste para a URL do avatar da sua API
+          guid: response.data.guid,
+          role: response.data.role,
+        });
 
         setAlert({
           type: "success",
@@ -63,11 +77,11 @@ export default function Login() {
         });
 
         setTimeout(() => {
-          // Redireciona conforme o tipo de usuário
+          // Redireciona conforme o tipo de usuário e o GUID
           if (response.data.role === "usuario") {
-            navigate("/usuario/meu-perfil");
+            navigate(`/usuario/meu-perfil/${response.data.guid}`);
           } else if (response.data.role === "instituicao") {
-            navigate("/instituicao/meu-perfil");
+            navigate("/instituicao/meu-perfil"); // Ou `/instituicao/meu-perfil/${response.data.guid}` se aplicar
           } else {
             navigate("/");
           }
@@ -75,14 +89,14 @@ export default function Login() {
       } else {
         setAlert({
           type: "danger",
-          message: response.data || "Email ou senha inválidos.",
+          message: response.data.message || response.data.error || "Email ou senha inválidos.",
         });
       }
     } catch (error) {
       setAlert({
         type: "warning",
         message:
-          error.response?.data ||
+          error.response?.data?.message ||
           error.message ||
           "Erro ao efetuar login. Tente novamente. Se o problema persistir, entre em contato com o suporte.",
       });
@@ -92,19 +106,18 @@ export default function Login() {
   };
 
   useEffect(() => {
-    // Verifica se o usuário já está logado
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (token) {
-      const role = localStorage.getItem("role");
-      if (role === "usuario") {
-        navigate("/usuario/meu-perfil");
-      } else if (role === "instituicao") {
-        navigate("/instituicao/meu-perfil");
+    if (contextIsLoggedIn) {
+      if (contextUserRole === "usuario" && contextUserGuid) {
+        navigate(`/usuario/meu-perfil/${contextUserGuid}`);
+      } else if (contextUserRole === "instituicao") {
+        navigate("/instituicao/meu-perfil"); 
       } else {
         navigate("/");
       }
     }
-  }, [navigate]);
+
+  }, [contextIsLoggedIn, contextUserRole, contextUserGuid, navigate]);
+
   return (
     <>
       {alert && (
@@ -271,7 +284,7 @@ export default function Login() {
           <p className="text-center text-sm text-customGray-600 mt-6">
             Não tem uma conta?{" "}
             <a
-              href={`/registrar?tipo=${userType}`}
+              href={`/usuario/criar-conta?tipo=${userType}`}
               className="text-secondary font-semibold hover:underline hover:text-secondary-dark transition-colors duration-200"
             >
               Crie uma agora!

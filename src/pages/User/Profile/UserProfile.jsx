@@ -1,8 +1,11 @@
 import React from 'react'
+import ProfileHero from './ProfileHero'
 
 const UserProfile = () => {
   return (
-    <div>UserProfile</div>
+    <>
+    <ProfileHero />
+    </>
   )
 }
 
