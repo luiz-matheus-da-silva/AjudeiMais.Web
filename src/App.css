@@ -1,0 +1,60 @@
+/* Em seu arquivo CSS principal (ex: src/index.css ou app.css) */
+
+/* Importação das fontes */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+/* Suas variáveis CSS existentes em :root */
+:root {
+    /* ... (todo o seu conteúdo de :root como você me enviou) ... */
+
+    /* Keyframes para a animação de gradiente */
+    @keyframes gradient-xy {
+      0%, 100% { background-position: left top; }
+      50% { background-position: right bottom; }
+    }
+}
+
+/* A diretiva do Tailwind CSS v4 */
+@import "tailwindcss";
+
+/*
+  Crie classes CSS customizadas que usem suas variáveis.
+  Você NÃO usará 'bg-primary' ou 'font-heading' no JSX.
+  Em vez disso, usará estas novas classes.
+*/
+.bg-custom-primary { background-color: var(--color-primary); }
+.bg-custom-primary-light { background-color: var(--color-primary-light); }
+.bg-custom-secondary-light { background-color: var(--color-secondary-light); }
+.bg-custom-accent { background-color: var(--color-accent); }
+.bg-custom-surface { background-color: var(--color-surface); }
+
+.text-custom-primary { color: var(--color-primary); }
+.text-custom-gray-600 { color: var(--color-gray-600); }
+.text-custom-secondary { color: var(--color-secondary); }
+.text-custom-white { color: var(--color-gray-100); } /* ou var(--color-white) se você adicionou */
+
+.font-style-heading { font-family: var(--font-family-heading); }
+.font-style-base { font-family: var(--font-family-base); }
+.font-style-accent { font-family: var(--font-family-accent); }
+
+/* Exemplo para o background com gradiente animado */
+.animated-gradient-bg {
+    background: linear-gradient(to bottom right, var(--color-primary-light), var(--color-secondary-light));
+    animation: gradient-xy 15s ease infinite;
+}
+
+/* Estilos globais (opcional) */
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-family-base); /* Aplica a fonte base */
+    color: var(--color-gray-900); /* Aplica a cor de texto base */
+}
+
+.navbar {
+    background-color: var(--color-primary);
+}
