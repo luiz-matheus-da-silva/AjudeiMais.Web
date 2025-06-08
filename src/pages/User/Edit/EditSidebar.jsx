@@ -98,45 +98,45 @@ const EditSidebar = ({
   };
 
   return (
-    <aside className="bg-white/80 backdrop-blur-sm rounded-r-2xl shadow-xl border-r border-white/20 p-4 w-72 h-screen flex flex-col gap-4 overflow-y-auto">
+    <aside className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 w-80 min-h-[600px] flex flex-col gap-6">
       {/* Header com título acolhedor */}
-      <div className="text-center space-y-2">
-        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
-          <Settings className="w-6 h-6 text-white" />
+      <div className="text-center space-y-3">
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+          <Settings className="w-8 h-8 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-heading font-bold text-primary-dark">
+          <h2 className="text-2xl font-heading font-bold text-primary-dark">
             Editar Perfil
           </h2>
-          <p className="text-xs text-customGray-600">
-            Mantenha suas informações atualizadas
+          <p className="text-sm text-customGray-600 mt-1">
+            Mantenha suas informações sempre atualizadas
           </p>
         </div>
       </div>
 
       {/* Barra de Progresso */}
-      <div className="space-y-1">
+      <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-xs font-medium text-customGray-700">
-            Progresso
+          <span className="text-sm font-medium text-customGray-700">
+            Progresso do Perfil
           </span>
-          <span className="text-xs font-bold text-accent">
+          <span className="text-sm font-bold text-accent">
             {Math.round(progressPercentage)}%
           </span>
         </div>
-        <div className="w-full bg-customGray-200 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-customGray-200 rounded-full h-2.5 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-accent to-accent-dark h-full rounded-full transition-all duration-700 ease-out"
+            className="bg-gradient-to-r from-accent to-accent-dark h-full rounded-full transition-all duration-700 ease-out shadow-sm"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
         <p className="text-xs text-customGray-500">
-          {completedSteps} de {steps.length} seções
+          {completedSteps} de {steps.length} seções concluídas
         </p>
       </div>
 
       {/* Navigation Steps */}
-      <nav className="flex flex-col gap-2 flex-1">
+      <nav className="flex flex-col gap-3 flex-1">
         {steps.map((step, idx) => {
           const isActive = idx === currentStep;
           const isCompleted = step.completed;
@@ -146,43 +146,69 @@ const EditSidebar = ({
               key={step.id}
               type="button"
               onClick={() => handleStepClick(idx)}
-              className={`group relative p-3 rounded-lg transition-all duration-300 text-left border overflow-hidden
+              className={`group relative p-4 rounded-xl transition-all duration-300 text-left border-2 overflow-hidden
                 ${isActive 
-                  ? 'border-accent bg-accent/10 shadow-md scale-[1.01]' 
+                  ? 'border-accent bg-gradient-to-r from-accent/10 to-accent/5 shadow-lg scale-[1.02]' 
                   : isCompleted
                     ? 'border-green-200 bg-green-50/50 hover:bg-green-100/50'
-                    : 'border-customGray-200 bg-white/50 hover:bg-customGray-50/50'
+                    : 'border-customGray-200 bg-white/50 hover:bg-customGray-50/50 hover:border-customGray-300'
                 }`}
             >
-              <div className="flex items-center gap-3">
+              {/* Background gradient effect */}
+              <div className={`absolute inset-0 bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+              
+              <div className="relative flex items-start gap-4">
                 {/* Step Icon/Status */}
-                <div className={`flex items-center justify-center rounded-lg w-8 h-8 transition-colors duration-300
+                <div className={`flex items-center justify-center rounded-xl w-12 h-12 transition-colors duration-300
                   ${isActive 
-                    ? 'bg-accent text-white' 
+                    ? 'bg-accent text-white shadow-lg' 
                     : isCompleted
                       ? 'bg-green-500 text-white'
-                      : 'bg-customGray-100 text-customGray-600'
+                      : 'bg-customGray-100 text-customGray-600 group-hover:bg-customGray-200'
                   }`}
                 >
-                  {isCompleted ? <Check size={16} /> : React.cloneElement(step.icon, { size: 16 })}
+                  {isCompleted ? <Check size={20} /> : step.icon}
                 </div>
 
                 {/* Step Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className={`font-semibold text-sm truncate
+                    <h3 className={`font-semibold text-base truncate
                       ${isActive ? 'text-accent-dark' : isCompleted ? 'text-green-700' : 'text-customGray-800'}
                     `}>
                       {step.label}
                     </h3>
-                    <ChevronRight className={`w-3 h-3 transition-transform duration-200
-                      ${isActive ? 'text-accent rotate-90' : 'text-customGray-400'}
+                    <ChevronRight className={`w-4 h-4 transition-transform duration-200
+                      ${isActive ? 'text-accent rotate-90' : 'text-customGray-400 group-hover:translate-x-1'}
                     `} />
                   </div>
                   
-                  <p className="text-xs text-customGray-600 mt-0.5 truncate">
+                  <p className="text-xs text-customGray-600 mt-1 mb-2 line-clamp-2">
                     {step.description}
                   </p>
+
+                  {/* Fields Preview */}
+                  <div className="flex flex-wrap gap-1">
+                    {step.fields.map((field, fieldIdx) => (
+                      <span
+                        key={fieldIdx}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs
+                          ${isActive 
+                            ? 'bg-accent/10 text-accent-dark' 
+                            : isCompleted
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-customGray-100 text-customGray-600'
+                          }
+                        `}
+                      >
+                        {field.icon}
+                        <span className="truncate max-w-20">{field.label}</span>
+                        {field.required && (
+                          <span className="text-red-500">*</span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </button>

@@ -20,7 +20,7 @@ const UserProfile = () => {
   }, [loginSuccess]);
 
   return (
-    <>
+    <div className="pt-10">
       {alert && (
         <Alert
           type={alert.type}
@@ -32,7 +32,7 @@ const UserProfile = () => {
 
       <ProfileHero />
       <ProfileRecentsAdvertisements />
-    </>
+    </div>
   );
 };
 

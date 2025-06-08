@@ -19,54 +19,58 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import { Link } from "react-router-dom";
-
-// Assumindo que useUser agora só fornece o objeto user
-import { useUser } from "@/contexts/UserContext"; // Ajuste o caminho para o seu hook useUser
+import { useUser } from "@/contexts/UserContext";
+import { Alert } from "../../../components/Alert";
 
 const ProfileRecentsAdvertisements = () => {
-  const { user } = useUser(); // Apenas desestruturando user, já que o token não será passado no header
+  const { user } = useUser(); 
 
   const [advertisements, setAdvertisements] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [alert, setAlert] = useState(null);
 
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     const fetchAdvertisements = async () => {
-      // Verificamos apenas se o user.guid está disponível
       if (!user?.guid) {
         setError(
           new Error("User ID not available. Cannot fetch advertisements.")
         );
         setIsLoading(false);
-        return; // Sai da função cedo
+        return;
       }
 
       const apiUrl = import.meta.env.VITE_API_URL;
 
       try {
-        // Removido o objeto de configuração com headers
         const response = await axios.get(
           `${apiUrl}/produto/usuario/${user.guid}`
         );
-        if(response.success){
-          setAdvertisements(response.data);
-          console.log("Dados do perfil recebidos:", response.data);
+        if (response.data && response.data.success) {
+          setAdvertisements(response.data.data);
+          console.log("Dados do perfil recebidos:", response.data.data);
         } else {
-          console.log(response.data.message);
+          setError(
+            new Error(response.data?.message || "Erro ao buscar anúncios.")
+          );
+          setAdvertisements([]);
+          console.log(response.data?.message);
         }
       } catch (err) {
         console.error("Erro ao buscar anúncios:", err);
-        setError(err); // Define o objeto de erro real
-        setAdvertisements([]); // Limpa os anúncios em caso de erro
+        setAlert({
+          type: "warning",
+          message: "Erro ao buscar anúncios. Se o problema persistir, entre em contato com o suporte.",
+        }); 
+        setAdvertisements([]); 
       } finally {
-        setIsLoading(false); // Sempre define isLoading como false no final
+        setIsLoading(false);
       }
     };
 
     fetchAdvertisements();
-    // A lista de dependências agora inclui apenas user?.guid
   }, [user?.guid]);
 
   // Função para rolar o carrossel para a esquerda
@@ -91,6 +95,9 @@ const ProfileRecentsAdvertisements = () => {
 
   return (
     <div className="mx-auto my-10 max-w-screen-xl px-4 md:px-0">
+      {alert && (
+        <Alert type={alert.type} children={alert.message}/>
+      )}
       {isLoading && (
         <Card className="w-full animate-pulse rounded-lg bg-white shadow-lg">
           <CardHeader>
@@ -128,28 +135,30 @@ const ProfileRecentsAdvertisements = () => {
         </Card>
       )}
 
-      {!isLoading && !error && (!advertisements || advertisements.length === 0) && (
-        <Card className="w-full rounded-lg bg-white p-6 text-center shadow-lg">
-          <CardHeader className="pb-4">
-            <CardTitle className="font-heading flex items-center justify-center gap-2 text-2xl text-primary-dark">
-              <Package size={28} /> Nenhum Anúncio Recente
-            </CardTitle>
-            <CardDescription className="font-base mt-2 text-customGray-600">
-              Parece que você ainda não tem anúncios publicados.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <p className="mb-6 text-lg text-customGray-700">
-              Que tal começar agora? Faça a diferença na vida de alguém!
-            </p>
-            <Link to="/anunciar">
-              <Button className="duration-3000 rounded-full bg-accent px-8 py-3 font-semibold shadow-md transition-all hover:bg-accent-dark hover:text-white">
-                <PlusCircle size={20} className="mr-2" /> Anunciar Agora!
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
+      {!isLoading &&
+        !error &&
+        (!advertisements || advertisements.length === 0) && (
+          <Card className="w-full rounded-lg bg-white p-6 text-center shadow-lg">
+            <CardHeader className="pb-4">
+              <CardTitle className="font-heading flex items-center justify-center gap-2 text-2xl text-primary-dark">
+                <Package size={28} /> Nenhum Anúncio Recente
+              </CardTitle>
+              <CardDescription className="font-base mt-2 text-customGray-600">
+                Parece que você ainda não tem anúncios publicados.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="mb-6 text-lg text-customGray-700">
+                Que tal começar agora? Faça a diferença na vida de alguém!
+              </p>
+              <Link to="/anunciar">
+                <Button className="duration-3000 rounded-full bg-accent px-8 py-3 font-semibold shadow-md transition-all hover:bg-accent-dark hover:text-white">
+                  <PlusCircle size={20} className="mr-2" /> Anunciar Agora!
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
 
       {!isLoading && !error && advertisements && advertisements.length > 0 && (
         <Card className="w-full rounded-lg bg-white shadow-lg">

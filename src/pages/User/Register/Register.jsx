@@ -24,9 +24,9 @@ import {
 } from "../../../utils/masks"; // Ajuste o caminho
 import { validateStep } from "../../../utils/validate-step"; // Ajuste o caminho
 import { searchCEP } from "../../../utils/search-cep"; // Ajuste o caminho
-import RegisterStep1 from "./RegisterStep1"; // Ajuste o caminho
-import RegisterStep2 from "./RegisterStep2"; // Ajuste o caminho
-import RegisterStep3 from "./RegisterStep3"; // Ajuste o caminho
+import RegisterStep1 from "./Steps/RegisterStep1"; // Ajuste o caminho
+import RegisterStep2 from "./Steps/RegisterStep2"; // Ajuste o caminho
+import RegisterStep3 from "./Steps/RegisterStep3"; // Ajuste o caminho
 
 export default function RegisterStepper() {
   const [searchParams] = useSearchParams();

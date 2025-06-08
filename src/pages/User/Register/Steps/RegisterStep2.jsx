@@ -1,6 +1,6 @@
 // src/components/auth/RegisterStep2.jsx
 import React from "react";
-import FormField from "../../../components/FormField";
+import FormField from "../../../../components/FormField";
 import { MapPin, Phone } from "lucide-react"; // Mantenha os ícones que já usa
 
 export default function RegisterStep2({
