@@ -24,28 +24,30 @@ export default function RegisterStep1({
           onChange={handleChange}
           error={errors.NomeCompleto}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            id="Documento"
-            name="Documento"
-            type="text"
-            placeholder="XXX.XXX.XXX-XX"
-            value={form.Documento}
-            onChange={handleChange}
-            error={errors.Documento}
-            maxLength={14}
-          />
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+  <FormField
+    id="Documento"
+    name="Documento"
+    type="text"
+    placeholder="XXX.XXX.XXX-XX"
+    value={form.Documento}
+    onChange={handleChange}
+    error={errors.Documento}
+    maxLength={14}
+    className="col-span-1 md:col-span-2"
+  />
 
-          <FormField
-            id="Email"
-            name="Email"
-            type="email"
-            placeholder="seuemail@exemplo.com"
-            value={form.Email}
-            onChange={handleChange}
-            error={errors.Email}
-          />
-        </div>
+  <FormField
+    id="Email"
+    name="Email"
+    type="email"
+    placeholder="seuemail@exemplo.com"
+    value={form.Email}
+    onChange={handleChange}
+    error={errors.Email}
+    className="col-span-1 md:col-span-3"
+  />
+</div>
         <hr className="border-customGray-300 my-4" />
 
         <h4 className="text-xl font-semibold text-customGray-800 flex items-center gap-2 mb-2">

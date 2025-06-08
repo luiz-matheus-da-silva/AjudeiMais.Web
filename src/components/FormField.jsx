@@ -44,7 +44,7 @@ export default function FormField({
   };
 
   return (
-    <div>
+    <div className={inputClassName}>
       <Label
         htmlFor={id}
         className="text-customGray-700 font-semibold mb-2 block"

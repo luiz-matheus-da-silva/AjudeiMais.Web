@@ -1,71 +1,83 @@
-// src/pages/ErrorPage.jsx
-import React from "react";
-import { Button } from "@/components/ui/button"; // Assuming Button is part of shadcn/ui or a similar library
+// src/components/ErrorBoundary.jsx
+import React from 'react';
+import { Bug, RefreshCcw } from 'lucide-react'; // Importe os ícones necessários
+import { Button } from "@/components/ui/button"; // Assumindo seu componente Button
 
-export default function ErrorPage() {
-  const handleGoHome = () => {
-    // This is generally fine for a simple "go home" action.
-    // If you're using React Router or similar, you might use:
-    // navigate('/') or window.location.replace('/') for cleaner history.
-    window.location.href = "/";
-  };
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null
+    };
+  }
 
-  return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen p-6
-                 bg-gradient-to-br from-primary-dark via-primary to-secondary-dark
-                 text-white font-base animate-gradient-xy"
-    >
-      {/* Animated Logo Icon (replace with your actual SVG logo) */}
-      {/* This is a placeholder; you'd replace the SVG paths with your logo. */}
-      {/* The animation classes come directly from your tailwind.config.js */}
-      <svg
-        className="w-24 h-24 text-accent animate-pulse mb-6"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor" // Changed to fill to better match logo styling
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        {/* Replace these paths with your actual logo's SVG paths */}
-        {/* For demonstration, I'm keeping a stylized "A" for "Accent" */}
-        <path d="M12 2L1 21h22L12 2zm0 6.83L17.5 18H6.5L12 6.83z" />
-        <circle cx="12" cy="15" r="2" />
-      </svg>
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
 
-      <h1 className="text-4xl font-heading text-secondary-light mb-4 text-center drop-shadow-lg">
-        Oops! Algo deu errado.
-      </h1>
-      <p className="max-w-md text-center text-customGray-200 mb-8 text-lg">
-        Estamos trabalhando para resolver isso o mais rápido possível. Enquanto isso, você pode voltar para a página inicial.
-      </p>
+  componentDidCatch(error, errorInfo) {
+    console.error("Erro capturado pelo Error Boundary:", error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
 
-      <Button
-        onClick={handleGoHome}
-        // Using your custom colors for the button
-        className="inline-flex items-center
-                   bg-secondary hover:bg-hover focus:ring-4 focus:ring-focus
-                   text-primary-dark font-accent font-bold px-6 py-3 rounded-md
-                   shadow-lg transition-all duration-300 ease-in-out select-none
-                   focus:outline-none transform hover:scale-105"
-        aria-label="Voltar para a página inicial"
-      >
-        {/* Refresh icon with a subtle spin animation */}
-        <svg
-          className="w-6 h-6 mr-3 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          className="flex flex-col items-center justify-center min-h-screen p-6
+                     bg-gradient-to-br from-primary-dark via-primary to-secondary-dark
+                     text-white font-base animate-gradient-xy"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 4v6h6M20 20v-6h-6"
-          />
-        </svg>
-        Voltar para a página inicial
-      </Button>
-    </div>
-  );
+          {/* Ícone de Bug Animado */}
+          <Bug size={96} className="text-danger mb-6 animate-bounce" />
+
+          <h1 className="text-4xl md:text-5xl font-heading text-secondary-light mb-4 text-center drop-shadow-lg">
+            Oops! Algo deu muito errado.
+          </h1>
+          <p className="max-w-md text-center text-customGray-200 mb-8 text-lg font-base">
+            Parece que encontramos um problema inesperado. Por favor, tente recarregar a página.
+            Se o problema persistir, entre em contato com o suporte.
+          </p>
+
+          {/* Botão de Recarregar */}
+          <Button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center
+                       bg-danger hover:bg-red-700 focus:ring-4 focus:ring-focus
+                       text-white font-accent font-bold px-6 py-3 rounded-md
+                       shadow-lg transition-all duration-300 ease-in-out select-none
+                       focus:outline-none transform hover:scale-105"
+            aria-label="Recarregar a página"
+          >
+            <RefreshCcw size={20} className="mr-3 animate-spin-slow" /> {/* Ícone de refresh com animação */}
+            Recarregar Página
+          </Button>
+
+          {/* Detalhes do Erro (Apenas em Desenvolvimento) */}
+          {process.env.NODE_ENV === 'development' && this.state.error && (
+            <details
+              className="mt-8 p-6 bg-customGray-900/70 backdrop-blur-sm rounded-lg border border-customGray-700
+                         text-customGray-100 max-w-lg overflow-auto shadow-xl"
+            >
+              <summary className="font-semibold cursor-pointer text-accent hover:text-accent-light transition-colors duration-200">
+                Detalhes Técnicos do Erro (somente em desenvolvimento)
+              </summary>
+              <pre className="mt-4 text-sm font-mono whitespace-pre-wrap break-words">
+                {this.state.error && this.state.error.toString()}
+                <br />
+                {this.state.errorInfo && this.state.errorInfo.componentStack}
+              </pre>
+            </details>
+          )}
+        </div>
+      );
+    }
+
+    // Se não houver erro, renderiza os componentes filhos normalmente.
+    return this.props.children;
+  }
 }
+
+export default ErrorBoundary;

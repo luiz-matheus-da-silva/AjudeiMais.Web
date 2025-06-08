@@ -100,6 +100,27 @@ export async function validateStep(step, form, setErrors) {
       isValid = false;
     }
   } else if (step === 3) {
+     // Validação da Foto de Perfil
+    if (!form.FotoDePerfil) {
+      newErrors.FotoDePerfil = "A foto de perfil é obrigatória.";
+      isValid = false;
+    } else if (form.FotoDePerfil instanceof File) {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+        "image/jpg"
+      ];
+      if (!allowedTypes.includes(form.FotoDePerfil.type)) {
+        newErrors.FotoDePerfil = "Formato inválido. Use JPG, PNG, WEBP ou GIF.";
+        isValid = false;
+      } else if (form.FotoDePerfil.size > 5 * 1024 * 1024) {
+        newErrors.FotoDePerfil = "A imagem deve ter no máximo 5MB.";
+        isValid = false;
+      }
+    }
+    
     if (!form.aceitoTermos) {
       newErrors.aceitoTermos = "Você deve aceitar os termos de uso.";
       isValid = false;

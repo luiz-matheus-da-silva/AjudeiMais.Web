@@ -1,10 +1,10 @@
 // src/components/auth/RegisterStep3.jsx
-import React from 'react';
-import { Checkbox } from "@radix-ui/react-checkbox";
+import React from "react";
+import { Checkbox, Indicator } from "@radix-ui/react-checkbox";
 import { Label } from "@radix-ui/react-label"; // Mantenha o import original do Label para o Checkbox
 import { CheckCircle, UploadCloud, XCircle } from "lucide-react"; // Importe XCircle
 import { Button } from "@/components/ui/button"; // Certifique-se de que o caminho para o Button está correto
-import FormField from "../../components/FormField"; 
+import FormField from "../../components/FormField";
 
 export default function RegisterStep3({
   form,
@@ -15,7 +15,7 @@ export default function RegisterStep3({
   showPassword,
   togglePasswordVisibility,
   toggleConfirmPasswordVisibility,
-  showConfirmPassword
+  showConfirmPassword,
 }) {
   return (
     <>
@@ -23,32 +23,34 @@ export default function RegisterStep3({
         <CheckCircle size={24} className="text-accent" /> Quase lá!
       </h3>
       <FormField
-                id="Senha"
-                name="Senha"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={form.Senha}
-                onChange={handleChange}
-                error={errors.Senha}
-                isPassword={true}
-                showToggle={true}
-                toggleFunction={togglePasswordVisibility}
-              />
-      
-              <FormField
-                id="ConfirmarSenha"
-                name="ConfirmarSenha"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={form.ConfirmarSenha}
-                onChange={handleChange}
-                error={errors.ConfirmarSenha}
-                isPassword={true}
-                showToggle={true}
-                toggleFunction={toggleConfirmPasswordVisibility}
-              />
-      
-      <div className="space-y-5"> {/* Aumentei o espaço para melhor visualização */}
+        id="Senha"
+        name="Senha"
+        type={showPassword ? "text" : "password"}
+        placeholder="••••••••"
+        value={form.Senha}
+        onChange={handleChange}
+        error={errors.Senha}
+        isPassword={true}
+        showToggle={true}
+        toggleFunction={togglePasswordVisibility}
+      />
+
+      <FormField
+        id="ConfirmarSenha"
+        name="ConfirmarSenha"
+        type={showConfirmPassword ? "text" : "password"}
+        placeholder="••••••••"
+        value={form.ConfirmarSenha}
+        onChange={handleChange}
+        error={errors.ConfirmarSenha}
+        isPassword={true}
+        showToggle={true}
+        toggleFunction={toggleConfirmPasswordVisibility}
+      />
+
+      <div className="space-y-5">
+        {" "}
+        {/* Aumentei o espaço para melhor visualização */}
         {/* Campo Foto de Perfil */}
         <div>
           <Label
@@ -59,7 +61,11 @@ export default function RegisterStep3({
           </Label>
           <div
             className={`flex flex-col items-center justify-center rounded-md p-6 bg-customGray-100 hover:bg-customGray-200 cursor-pointer transition-colors duration-200 relative
-              ${errors.FotoDePerfil ? 'border-2 border-danger' : 'border border-customGray-300'}
+              ${
+                errors.FotoDePerfil
+                  ? "border-2 border-danger"
+                  : "border border-customGray-300"
+              }
             `}
             // Permite clicar em qualquer lugar para ativar o input de arquivo
             onClick={() => document.getElementById("FotoDePerfil").click()}
@@ -72,7 +78,9 @@ export default function RegisterStep3({
               onChange={handleChange}
               className="hidden" // Esconde o input padrão
               aria-invalid={errors.FotoDePerfil ? "true" : "false"}
-              aria-describedby={errors.FotoDePerfil ? "FotoDePerfil-error" : undefined}
+              aria-describedby={
+                errors.FotoDePerfil ? "FotoDePerfil-error" : undefined
+              }
             />
             {previewFoto ? (
               <img
@@ -116,7 +124,6 @@ export default function RegisterStep3({
             <p className="text-danger text-sm mt-1">{errors.FotoDePerfil}</p>
           )}
         </div>
-
         {/* Checkbox de Termos e Condições */}
         <div className="mt-6">
           <div className="flex items-center space-x-2 relative">
@@ -126,11 +133,31 @@ export default function RegisterStep3({
               checked={form.aceitoTermos}
               onCheckedChange={handleTermsChange}
               className={`w-4 h-4 text-primary rounded focus:ring-primary
-                ${errors.aceitoTermos ? 'border-2 border-danger' : 'border border-customGray-300'}
+                ${
+                  errors.aceitoTermos
+                    ? "border-2 border-danger"
+                    : "border border-customGray-300"
+                }
               `}
               aria-invalid={errors.aceitoTermos ? "true" : "false"}
-              aria-describedby={errors.aceitoTermos ? "aceitoTermos-error" : undefined}
-            />
+              aria-describedby={
+                errors.aceitoTermos ? "aceitoTermos-error" : undefined
+              }
+            >
+              <Indicator>
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </Indicator>
+            </Checkbox>
             <Label
               htmlFor="aceitoTermos"
               className="text-sm text-customGray-600 cursor-pointer"
@@ -156,7 +183,9 @@ export default function RegisterStep3({
               .
             </Label>
             {errors.aceitoTermos && (
-              <div className="absolute -top-6 right-0 text-danger cursor-help group"> {/* Ajustado a posição para aparecer acima do texto */}
+              <div className="absolute -top-6 right-0 text-danger cursor-help group">
+                {" "}
+                {/* Ajustado a posição para aparecer acima do texto */}
                 <XCircle size={20} />
                 <span
                   id="aceitoTermos-error"
