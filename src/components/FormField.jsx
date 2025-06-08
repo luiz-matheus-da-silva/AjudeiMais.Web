@@ -12,12 +12,11 @@ export default function FormField({
   value,
   onChange,
   error,
-  onBlur, // <-- Garanta que onBlur está sendo desestruturado aqui
+  onBlur,
   maxLength,
   isPassword = false,
   showToggle = false,
   toggleFunction = null,
-  // Adicione aqui as novas props caso as tenha adicionado no .tsx
   readOnly = false,
   className: inputClassName = '', // Renomeado para evitar conflito com 'className' de estilo externo
   required = true,
