@@ -4,7 +4,7 @@ import { Checkbox, Indicator } from "@radix-ui/react-checkbox";
 import { Label } from "@radix-ui/react-label"; // Mantenha o import original do Label para o Checkbox
 import { CheckCircle, UploadCloud, XCircle } from "lucide-react"; // Importe XCircle
 import { Button } from "@/components/ui/button"; // Certifique-se de que o caminho para o Button está correto
-import FormField from "../../components/FormField";
+import FormField from "../../../components/FormField";
 
 export default function RegisterStep3({
   form,

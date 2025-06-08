@@ -1,6 +1,6 @@
 // src/components/auth/RegisterStep1.jsx
 import React from "react"; // Certifique-se de importar React
-import FormField from "../../components/FormField"; // Importe o novo componente FormField
+import FormField from "../../../components/FormField"; // Importe o novo componente FormField
 import { Phone } from "lucide-react";
 
 export default function RegisterStep1({

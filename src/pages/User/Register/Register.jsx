@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button"; // Ajuste o caminho se necessário
-import { Alert } from "../../components/Alert";
+import { Alert } from "../../../components/Alert";
 import {
   Eye,
   EyeOff,
@@ -21,13 +21,13 @@ import {
   maskCPF,
   maskPhoneMobile,
   maskNome,
-} from "../../utils/masks"; // Ajuste o caminho
-import { validateStep } from "../../utils/validate-step"; // Ajuste o caminho
-import { searchCEP } from "../../utils/search-cep"; // Ajuste o caminho
+} from "../../../utils/masks"; // Ajuste o caminho
+import { validateStep } from "../../../utils/validate-step"; // Ajuste o caminho
+import { searchCEP } from "../../../utils/search-cep"; // Ajuste o caminho
 import RegisterStep1 from "./RegisterStep1"; // Ajuste o caminho
 import RegisterStep2 from "./RegisterStep2"; // Ajuste o caminho
 import RegisterStep3 from "./RegisterStep3"; // Ajuste o caminho
-import { registerUser } from "../../api/registerUser";
+import { registerUser } from "../../../api/registerUser";
 
 export default function RegisterStepper() {
   const [searchParams] = useSearchParams();
