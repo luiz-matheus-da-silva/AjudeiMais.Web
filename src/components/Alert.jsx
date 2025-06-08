@@ -1,5 +1,10 @@
-import React, { useEffect } from "react";
-import { CrossCircledIcon, CheckCircledIcon, InfoCircledIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import React, { useEffect, useState } from "react";
+import {
+  CrossCircledIcon,
+  CheckCircledIcon,
+  InfoCircledIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 
 const icons = {
   success: CheckCircledIcon,
@@ -9,20 +14,42 @@ const icons = {
 };
 
 const colors = {
-  success: "border-green-500 text-green-700",
-  danger: "border-red-500 text-red-700",
-  warning: "border-yellow-500 text-yellow-700",
-  info: "border-blue-500 text-blue-700",
+  success: {
+    border: "border-green-500",
+    text: "text-green-700",
+    bar: "bg-green-500",
+  },
+  danger: {
+    border: "border-red-500",
+    text: "text-red-700",
+    bar: "bg-red-500",
+  },
+  warning: {
+    border: "border-yellow-500",
+    text: "text-yellow-700",
+    bar: "bg-yellow-500",
+  },
+  info: {
+    border: "border-blue-500",
+    text: "text-blue-700",
+    bar: "bg-blue-500",
+  },
 };
 
 export function Alert({ type = "info", children, onClose, duration = 5000 }) {
   const Icon = icons[type];
-  const colorClasses = colors[type] || colors.info;
+  const { border, text, bar } = colors[type] || colors.info;
+
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!onClose) return;
+    setVisible(true);
+
     const timer = setTimeout(() => {
-      onClose();
+      setVisible(false);
+      setTimeout(() => {
+        if (onClose) onClose();
+      }, 300); // aguarda o fade-out
     }, duration);
 
     return () => clearTimeout(timer);
@@ -30,14 +57,34 @@ export function Alert({ type = "info", children, onClose, duration = 5000 }) {
 
   return (
     <div
-      role="alert"
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-3 border-l-4 bg-white px-4 py-3 rounded-md shadow-sm ${colorClasses} max-w-md z-50`}
+      className={`fixed bottom-4 left-4 z-50 max-w-sm w-full transition-all duration-300 ease-in-out ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
     >
-      <Icon
-        className="w-6 h-6 animate-pulse"
-        aria-hidden="true"
-      />
-      <p className="text-sm font-medium">{children}</p>
+      <div
+        role="alert"
+        className={`flex items-start gap-3 border-l-4 ${border} ${text} bg-white px-4 py-3 rounded-md shadow-lg relative overflow-hidden`}
+      >
+        <Icon className="w-5 h-5 mt-1 flex-shrink-0" />
+        <p className="text-sm font-medium">{children}</p>
+
+        {/* Barrinha animada */}
+        <div
+          className={`absolute bottom-0 left-0 h-1 ${bar}`}
+          style={{
+            width: "100%",
+            animation: `shrinkBar ${duration}ms linear forwards`,
+          }}
+        ></div>
+      </div>
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes shrinkBar {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
     </div>
   );
 }

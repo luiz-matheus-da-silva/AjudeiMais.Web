@@ -7,11 +7,16 @@ import { Eye, EyeOff, HandHeart, Building } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "../components/Alert"; // Certifique-se de que o caminho está correto
 import axios from "axios";
-import { useAuth } from '../contexts/AuthContext'; 
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login: authLogin, isLoggedIn: contextIsLoggedIn, userGuid: contextUserGuid, userRole: contextUserRole } = useAuth();
+  const {
+    login: authLogin,
+    isLoggedIn: contextIsLoggedIn,
+    userGuid: contextUserGuid,
+    userRole: contextUserRole,
+  } = useAuth();
 
   const [alert, setAlert] = React.useState(null);
   const [userType, setUserType] = useState("usuario");
@@ -66,24 +71,22 @@ export default function Login() {
           role: response.data.role,
         });
 
-        setAlert({
-          type: "success",
-          message: "Login efetuado com sucesso!",
-        });
-
         setTimeout(() => {
           if (response.data.role === "usuario") {
-            navigate(`/usuario/meu-perfil/${response.data.guid}`);
+            navigate(`/usuario/meu-perfil/${response.data.guid}?login=success`);
           } else if (response.data.role === "instituicao") {
-            navigate("/instituicao/meu-perfil"); // Ou `/instituicao/meu-perfil/${response.data.guid}` se aplicar
+            navigate("/instituicao/meu-perfil?login=success");
           } else {
-            navigate("/");
+            navigate("/?login=success");
           }
         }, 1200);
       } else {
         setAlert({
           type: "danger",
-          message: response.data.message || response.data.error || "Email ou senha inválidos.",
+          message:
+            response.data.message ||
+            response.data.error ||
+            "Email ou senha inválidos.",
         });
       }
     } catch (error) {
@@ -104,12 +107,11 @@ export default function Login() {
       if (contextUserRole === "usuario" && contextUserGuid) {
         navigate(`/usuario/meu-perfil/${contextUserGuid}`);
       } else if (contextUserRole === "instituicao") {
-        navigate("/instituicao/meu-perfil"); 
+        navigate("/instituicao/meu-perfil");
       } else {
         navigate("/");
       }
     }
-
   }, [contextIsLoggedIn, contextUserRole, contextUserGuid, navigate]);
 
   return (

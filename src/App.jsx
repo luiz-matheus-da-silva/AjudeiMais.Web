@@ -55,7 +55,7 @@ function InnerAppContent() {
             userGuid={user.guid}
           />
         )}
-      <div className="pt-16">
+      <div className={`${isLoggedIn ? "pt-16" : ""}`}>
         <ErrorBoundary>
           <Routes>
             <Route path="/login" element={<Login />} />
