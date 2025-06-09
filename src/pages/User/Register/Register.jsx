@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button"; // Ajuste o caminho se necessário
+import { Button } from "@/components/ui/button";
 import { Alert } from "../../../components/Alert";
 import {
   Eye,
   EyeOff,
-  HandHeart, // Ícone que pode ser usado como logo
+  HandHeart,
   User,
   MapPin,
   Sparkles,
@@ -21,52 +21,65 @@ import {
   maskCPF,
   maskPhoneMobile,
   maskNome,
-} from "../../../utils/masks"; // Ajuste o caminho
-import { validateStep } from "../../../utils/validate-step"; // Ajuste o caminho
-import { searchCEP } from "../../../utils/search-cep"; // Ajuste o caminho
-import RegisterStep1 from "./Steps/RegisterStep1"; // Ajuste o caminho
-import RegisterStep2 from "./Steps/RegisterStep2"; // Ajuste o caminho
-import RegisterStep3 from "./Steps/RegisterStep3"; // Ajuste o caminho
+} from "../../../utils/masks";
+import { validateStep } from "../../../utils/validate-step";
+import { searchCEP } from "../../../utils/search-cep";
+import RegisterStep1 from "./Steps/RegisterStep1";
+import RegisterStep2 from "./Steps/RegisterStep2";
+import RegisterStep3 from "./Steps/RegisterStep3";
+
+// Import Lottie and the success animation JSON
+import Lottie from "react-lottie";
+import successAnimation from "../../../animations/success-animation.json"; // <--- NOVO IMPORT AQUI!
 
 export default function RegisterStepper() {
   const [searchParams] = useSearchParams();
   const initialUserType = searchParams.get("tipo");
   const [userType, setUserType] = useState(
     initialUserType === "instituicao" ? "instituicao" : "doador"
-  ); // Corrigido para inicializar corretamente
+  );
 
   const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     NomeCompleto: "",
-    Documento: "", // CPF ou CNPJ
+    Documento: "",
     Email: "",
     Senha: "",
     ConfirmarSenha: "",
-    Role: "role", // Role baseada na seleção inicial
+    Role: "role",
     CEP: "",
     Rua: "",
-    Numero: "", // Tipo int no backend
+    Numero: "",
     Complemento: "",
     Bairro: "",
     Cidade: "",
     Estado: "",
-    FotoDePerfil: null, // Para o upload do arquivo
+    FotoDePerfil: null,
     TelefoneFixo: "",
-    Telefone: "", // Celular
+    Telefone: "",
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [previewFoto, setPreviewFoto] = useState(null); // Para pré-visualização da imagem
+  const [previewFoto, setPreviewFoto] = useState(null);
 
-  // Sincronizar userType e Role com a URL
   const [alert, setAlert] = React.useState(null);
 
   useEffect(() => {
-    setForm((prevForm) => ({ ...prevForm, Role: userType })); // Usa o estado 'userType'
-  }, [userType]); // Adiciona userType como dependência
+    setForm((prevForm) => ({ ...prevForm, Role: userType }));
+  }, [userType]);
+
+  // Lottie Options for Success Animation
+  const successLottieOptions = {
+    loop: false, // Usually, success animations play once
+    autoplay: true,
+    animationData: successAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () =>
@@ -79,6 +92,10 @@ export default function RegisterStepper() {
 
     if (name === "Documento") {
       newValue = maskCPF(value);
+      // Se for CNPJ (para instituições), adicione a lógica aqui
+      if (userType === "instituicao") {
+        newValue = maskCNPJ(value);
+      }
     }
     if (name === "NomeCompleto") {
       newValue = maskNome(value);
@@ -108,7 +125,6 @@ export default function RegisterStepper() {
       });
     }
 
-    // Limpar erro ao interagir com o campo
     if (errors[name]) {
       setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
     }
@@ -125,7 +141,7 @@ export default function RegisterStepper() {
   };
 
   const handleNext = async () => {
-    const isValid = await validateStep(currentStep, form, setErrors);
+    const isValid = await validateStep(currentStep, form, setErrors, userType); // Passe userType para validação
     if (isValid) {
       setCurrentStep((prev) => prev + 1);
     }
@@ -138,8 +154,12 @@ export default function RegisterStepper() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const isValid = await validateStep(currentStep, form, setErrors);
+    const isValid = await validateStep(currentStep, form, setErrors, userType); // Passe userType para validação
     if (!isValid) {
+      setAlert({
+        type: "danger",
+        message: "Por favor, corrija os erros no formulário antes de continuar.",
+      });
       return;
     }
 
@@ -148,10 +168,8 @@ export default function RegisterStepper() {
 
     const apiUrl = `${import.meta.env.VITE_API_URL}/usuario`;
 
-    // Monta o FormData
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      // Só adiciona se não for nulo/undefined
       if (value !== undefined && value !== null) {
         formData.append(key, value);
       }
@@ -166,11 +184,18 @@ export default function RegisterStepper() {
 
       const data = response.data;
 
-      setAlert({
-        type: data?.success ? "success" : "error",
-        message: data?.message || "Conta criada com sucesso!",
-      });
-      setRegistrationSuccess(true);
+      if (data?.success) {
+        setAlert({
+          type: "success",
+          message: data?.message || "Conta criada com sucesso!",
+        });
+        setRegistrationSuccess(true); // <--- ATENÇÃO: Isso agora ativará a tela de sucesso animada
+      } else {
+        setAlert({
+          type: "danger",
+          message: data?.message || "Erro ao criar conta.",
+        });
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -178,7 +203,7 @@ export default function RegisterStepper() {
         "Erro ao criar conta. Tente novamente.";
 
       setAlert({
-        type: "error",
+        type: "danger",
         message: errorMessage,
       });
 
@@ -200,6 +225,7 @@ export default function RegisterStepper() {
             showConfirmPassword={showConfirmPassword}
             togglePasswordVisibility={togglePasswordVisibility}
             toggleConfirmPasswordVisibility={toggleConfirmPasswordVisibility}
+            userType={userType} // Passa userType para renderizar campos específicos
           />
         );
       case 2:
@@ -254,15 +280,13 @@ export default function RegisterStepper() {
           {/* Seção da Logo (Esquerda) */}
           <div className="flex-1 text-center lg:text-left p-6 lg:p-0">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-3xl mb-6 shadow-xl">
-              <HandHeart className="w-14 h-14 text-white" /> {/* Logo maior */}
+              <HandHeart className="w-14 h-14 text-white" />
             </div>
             <h1 className="text-5xl font-heading text-primary font-bold leading-tight mb-4">
-              Transforme <span className="text-secondary">Vidas</span> com Sua
-              Doação.
+              Transforme <span className="text-secondary">Vidas</span> com Sua Doação.
             </h1>
             <p className="text-customGray-700 text-lg max-w-md mx-auto lg:mx-0">
-              Junte-se à nossa rede de solidariedade e faça a diferença no
-              mundo.
+              Junte-se à nossa rede de solidariedade e faça a diferença no mundo.
             </p>
           </div>
 
@@ -334,9 +358,9 @@ export default function RegisterStepper() {
 
             {registrationSuccess ? (
               <div className="text-center space-y-6 py-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent to-secondary rounded-full mb-4 shadow-xl animate-bounce">
-                  <CheckCircle className="w-10 h-10 text-white" />
-                </div>
+                {/* Lottie Animation for Success */}
+                <Lottie options={successLottieOptions} height={150} width={150} /> {/* Ajuste o tamanho conforme desejar */}
+
                 <div className="space-y-3">
                   <h2 className="text-2xl font-heading text-primary font-bold">
                     🎉 Parabéns!
@@ -349,8 +373,6 @@ export default function RegisterStepper() {
                   </p>
                 </div>
                 <Link to="/login" className="block w-full">
-                  {" "}
-                  {/* Garante que o Link se comporte como um bloco */}
                   <Button className="w-full py-4 text-lg font-accent font-semibold rounded-xl shadow-lg bg-gradient-to-r from-accent to-secondary text-white hover:shadow-xl hover:scale-105 transition-all duration-300 border-0">
                     Ir para o Login
                   </Button>

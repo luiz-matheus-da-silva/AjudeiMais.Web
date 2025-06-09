@@ -1,96 +1,85 @@
-// src/components/ui/FormField.jsx (ou FormField.tsx)
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, XCircle } from "lucide-react";
+// components/FormField.jsx
+import React from "react";
+import { Eye, EyeOff } from "lucide-react"; // Importe os ícones de olho
 
 export default function FormField({
   id,
   name,
-  type,
+  label,
+  type, // Este `type` vai determinar se é password ou text
   placeholder,
   value,
   onChange,
   error,
-  onBlur,
+  required,
+  isPassword,     // Indica se o campo é de senha
+  showToggle,     // Indica se deve mostrar o toggle do olho
+  toggleFunction, // Função para alternar a visibilidade da senha
+  readOnly,
   maxLength,
-  isPassword = false,
-  showToggle = false,
-  toggleFunction = null,
-  readOnly = false,
-  className: inputClassName = '', // Renomeado para evitar conflito com 'className' de estilo externo
-  required = true,
+  className,      // Adicionei className para permitir estilos no container do FormField
+  ...props
 }) {
-  const getLabelText = (fieldId) => {
-    switch (fieldId) {
-      case "NomeCompleto": return "Nome Completo";
-      case "Documento": return "CPF";
-      case "Email": return "Email";
-      case "Senha": return "Senha";
-      case "ConfirmarSenha": return "Confirmar Senha";
-      case "CEP": return "CEP";
-      case "Rua": return "Rua";
-      case "Numero": return "Número";
-      case "Complemento": return "Complemento (Opcional)";
-      case "Bairro": return "Bairro";
-      case "Cidade": return "Cidade";
-      case "Estado": return "Estado (UF)";
-      case "TelefoneFixo": return "Telefone Fixo (Opcional)";
-      case "Telefone": return "Telefone Celular";
-      default:
-        return id;
-    }
-  };
-
   return (
-    <div className={inputClassName}>
-      <Label
-        htmlFor={id}
-        className="text-customGray-700 font-semibold mb-2 block"
-      >
-        {getLabelText(id)}
-      </Label>
-      <div className="relative group">
-        <Input
-          id={id}
-          type={type}
-          name={name}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur} // <--- ADICIONE ESTA LINHA AQUI!
-          required={required} // Adicione esta prop aqui
-          maxLength={maxLength}
-          readOnly={readOnly} // Adicione esta prop aqui
-          className={`w-full p-3.5 ${isPassword ? 'pr-12' : 'pr-10'} rounded-lg focus:ring-2 transition-all duration-200 text-customGray-800 placeholder-customGray-500
-            ${error ? 'border-danger focus:ring-danger-light' : 'border-customGray-400 focus:ring-secondary focus:border-secondary-light'}
-            ${inputClassName} `}
-          aria-invalid={error ? "true" : "false"}
-          aria-describedby={error ? `${id}-error` : undefined}
-        />
-        {isPassword && showToggle && (
-          <button
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-customGray-600 hover:text-primary-dark transition-colors duration-200"
-            onClick={toggleFunction}
-            aria-label={type === "password" ? "Mostrar senha" : "Esconder senha"}
-          >
-            {type === "password" ? <Eye size={22} /> : <EyeOff size={22} />}
-          </button>
-        )}
-        {error && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-danger cursor-help z-10">
-            <XCircle size={20} />
-            <span
-              id={`${id}-error`}
-              role="alert"
-              className="absolute hidden group-hover:block -right-2 transform translate-x-full mt-2 w-max max-w-[200px] p-2 bg-danger text-white text-xs rounded-md shadow-lg z-20 whitespace-normal"
-            >
-              {error}
+    // Aplique o 'relative' ao div que envolve o input e o botão do olho
+    // Removi o 'form-field-container' e usei 'relative' diretamente.
+    // O 'className' passado nas props do FormField agora é aplicado aqui.
+    <div className={`relative ${className}`}>
+      {label && (
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
+      <input
+        id={id}
+        name={name}
+        type={type} // O tipo do input é controlado pela prop 'type'
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        maxLength={maxLength}
+        className={`block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm ${
+          error ? "border-red-500" : ""
+        } ${isPassword && showToggle ? "pr-10" : ""}`} 
+        {...props}
+      />
+
+      {/* Lógica para o ícone de olho */}
+      {isPassword && showToggle && (
+        <button
+          type="button"
+          onClick={toggleFunction}
+          // Posicione o botão de forma absoluta dentro do container relativo
+          // Use 'absolute inset-y-0 right-0' para centralizar verticalmente no input
+          // 'pr-3' para padding à direita
+          className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          aria-label={type === "password" ? "Mostrar senha" : "Esconder senha"}
+        >
+          {/* Adiciona uma condição para quando o label existe, para ajustar o top */}
+          {label ? (
+            <span className="mt-6 flex items-center"> {/* Ajuste o margin-top para alinhar se houver label */}
+                {type === "password" ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" /> // Ícone para "esconder"
+                ) : (
+                    <Eye className="h-5 w-5 text-gray-400" /> // Ícone para "mostrar"
+                )}
             </span>
-          </div>
-        )}
-      </div>
+          ) : (
+            // Se não houver label, o posicionamento padrão inset-y-0 funciona bem
+            <>
+                {type === "password" ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                )}
+            </>
+          )}
+        </button>
+      )}
+
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
 }

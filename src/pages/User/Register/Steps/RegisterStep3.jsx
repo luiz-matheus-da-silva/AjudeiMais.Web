@@ -23,6 +23,7 @@ export default function RegisterStep3({
         <CheckCircle size={24} className="text-accent" /> Quase lá!
       </h3>
       <FormField
+        Label="Senha"
         id="Senha"
         name="Senha"
         type={showPassword ? "text" : "password"}
@@ -36,6 +37,7 @@ export default function RegisterStep3({
       />
 
       <FormField
+      Label="Confirmar Senha"
         id="ConfirmarSenha"
         name="ConfirmarSenha"
         type={showConfirmPassword ? "text" : "password"}

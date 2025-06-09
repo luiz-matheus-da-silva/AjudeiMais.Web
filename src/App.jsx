@@ -1,249 +1,86 @@
-import React, { useState } from "react";
-import {
-  User,
-  MapPin,
-  Mail,
-  Lock,
-  Image,
-  Phone,
-  FileText,
-  Check,
-  AlertCircle,
-  Trash2,
-  ChevronRight,
-  Shield,
-  Heart,
-  Settings,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { UserProvider, useUser } from "./contexts/UserContext"; // Certifique-se que está importado
+import NotFoundPage from "./pages/NotFoundPage";
+import RegisterStepper from "./pages/User/Register/Register";
+import Login from "./pages/Login";
+import UserProfile from "./pages/User/Profile/UserProfile";
+import UserNavbar from "./pages/User/UserNavbar";
+import UserEditProfile from "./pages/User/Edit/UserEditProfile";
 
-const steps = [
-  {
-    id: "personal",
-    label: "Informações Pessoais",
-    description: "Seus dados básicos e identificação",
-    icon: <User size={20} />,
-    color: "from-blue-500 to-blue-600",
-    fields: [
-      { label: "Nome Completo", icon: <User size={16} />, required: true },
-      { label: "CPF/CNPJ", icon: <FileText size={16} />, required: true },
-      { label: "Foto de Perfil", icon: <Image size={16} />, required: false },
-    ],
-    completed: true,
-  },
-  {
-    id: "contact",
-    label: "Contato",
-    description: "Como podemos nos comunicar com você",
-    icon: <Mail size={20} />,
-    color: "from-green-500 to-green-600",
-    fields: [
-      { label: "Email Principal", icon: <Mail size={16} />, required: true },
-      { label: "Telefone", icon: <Phone size={16} />, required: false },
-      { label: "Celular", icon: <Phone size={16} />, required: true },
-    ],
-    completed: false,
-  },
-  {
-    id: "address",
-    label: "Endereço",
-    description: "Onde você está localizado",
-    icon: <MapPin size={20} />,
-    color: "from-purple-500 to-purple-600",
-    fields: [
-      { label: "CEP", icon: <MapPin size={16} />, required: true },
-      { label: "Endereço Completo", icon: <MapPin size={16} />, required: true },
-      { label: "Complemento", icon: <MapPin size={16} />, required: false },
-    ],
-    completed: false,
-  },
-  {
-    id: "security",
-    label: "Segurança",
-    description: "Proteja sua conta com uma senha forte",
-    icon: <Lock size={20} />,
-    color: "from-orange-500 to-orange-600",
-    fields: [
-      { label: "Senha Atual", icon: <Lock size={16} />, required: true },
-      { label: "Nova Senha", icon: <Lock size={16} />, required: true },
-      { label: "Confirmar Senha", icon: <Lock size={16} />, required: true },
-    ],
-    completed: false,
-  },
-];
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        {" "}
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
 
-const EditSidebar = ({
-  currentStep = 0,
-  onStepChange,
-  onDeleteAccount,
-  userType = "doador",
-}) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  
-  const completedSteps = steps.filter(step => step.completed).length;
-  const progressPercentage = (completedSteps / steps.length) * 100;
-
-  const handleStepClick = (index) => {
-    onStepChange && onStepChange(index);
-  };
-
-  const handleDeleteClick = () => {
-    if (showDeleteConfirm) {
-      onDeleteAccount && onDeleteAccount();
-    } else {
-      setShowDeleteConfirm(true);
-      // Reset after 5 seconds
-      setTimeout(() => setShowDeleteConfirm(false), 5000);
-    }
-  };
+function AppContent() {
+  const { isLoggedIn, userGuid, userRole, logout, loadingUserProfile } =
+    useAuth();
 
   return (
-    <aside className="bg-white/80 backdrop-blur-sm rounded-r-2xl shadow-xl border-r border-white/20 p-4 w-72 h-screen flex flex-col gap-4 overflow-y-auto">
-      {/* Header com título acolhedor */}
-      <div className="text-center space-y-2">
-        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
-          <Settings className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <h2 className="text-xl font-heading font-bold text-primary-dark">
-            Editar Perfil
-          </h2>
-          <p className="text-xs text-customGray-600">
-            Mantenha suas informações atualizadas
-          </p>
-        </div>
-      </div>
-
-      {/* Barra de Progresso */}
-      <div className="space-y-1">
-        <div className="flex justify-between items-center">
-          <span className="text-xs font-medium text-customGray-700">
-            Progresso
-          </span>
-          <span className="text-xs font-bold text-accent">
-            {Math.round(progressPercentage)}%
-          </span>
-        </div>
-        <div className="w-full bg-customGray-200 rounded-full h-2 overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-accent to-accent-dark h-full rounded-full transition-all duration-700 ease-out"
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
-        <p className="text-xs text-customGray-500">
-          {completedSteps} de {steps.length} seções
-        </p>
-      </div>
-
-      {/* Navigation Steps */}
-      <nav className="flex flex-col gap-2 flex-1">
-        {steps.map((step, idx) => {
-          const isActive = idx === currentStep;
-          const isCompleted = step.completed;
-          
-          return (
-            <button
-              key={step.id}
-              type="button"
-              onClick={() => handleStepClick(idx)}
-              className={`group relative p-3 rounded-lg transition-all duration-300 text-left border overflow-hidden
-                ${isActive 
-                  ? 'border-accent bg-accent/10 shadow-md scale-[1.01]' 
-                  : isCompleted
-                    ? 'border-green-200 bg-green-50/50 hover:bg-green-100/50'
-                    : 'border-customGray-200 bg-white/50 hover:bg-customGray-50/50'
-                }`}
-            >
-              <div className="flex items-center gap-3">
-                {/* Step Icon/Status */}
-                <div className={`flex items-center justify-center rounded-lg w-8 h-8 transition-colors duration-300
-                  ${isActive 
-                    ? 'bg-accent text-white' 
-                    : isCompleted
-                      ? 'bg-green-500 text-white'
-                      : 'bg-customGray-100 text-customGray-600'
-                  }`}
-                >
-                  {isCompleted ? <Check size={16} /> : React.cloneElement(step.icon, { size: 16 })}
-                </div>
-
-                {/* Step Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className={`font-semibold text-sm truncate
-                      ${isActive ? 'text-accent-dark' : isCompleted ? 'text-green-700' : 'text-customGray-800'}
-                    `}>
-                      {step.label}
-                    </h3>
-                    <ChevronRight className={`w-3 h-3 transition-transform duration-200
-                      ${isActive ? 'text-accent rotate-90' : 'text-customGray-400'}
-                    `} />
-                  </div>
-                  
-                  <p className="text-xs text-customGray-600 mt-0.5 truncate">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Footer Actions */}
-      <div className="border-t border-customGray-200 pt-6 space-y-4">
-        {/* Trust Badge */}
-        <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary-light/10 to-secondary-light/10 rounded-lg border border-primary-light/20">
-          <Shield className="w-5 h-5 text-primary" />
-          <div>
-            <p className="text-sm font-medium text-primary-dark">
-              Seus dados estão seguros
-            </p>
-            <p className="text-xs text-customGray-600">
-              Criptografia de ponta a ponta
-            </p>
-          </div>
-        </div>
-
-        {/* Delete Account */}
-        <Button
-          type="button"
-          variant="destructive"
-          className={`w-full flex items-center gap-2 justify-center py-3 rounded-xl font-semibold transition-all duration-300
-            ${showDeleteConfirm 
-              ? 'bg-red-600 hover:bg-red-700 animate-pulse' 
-              : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 hover:scale-105'
-            }`}
-          onClick={handleDeleteClick}
-        >
-          {showDeleteConfirm ? (
-            <>
-              <AlertCircle size={18} />
-              Confirme: Excluir Conta
-            </>
-          ) : (
-            <>
-              <Trash2 size={18} />
-              Excluir Conta
-            </>
-          )}
-        </Button>
-        
-        {showDeleteConfirm && (
-          <p className="text-xs text-red-600 text-center animate-fade-in">
-            ⚠️ Esta ação é irreversível. Clique novamente para confirmar.
-          </p>
-        )}
-        
-        {!showDeleteConfirm && (
-          <p className="text-xs text-customGray-500 text-center flex items-center justify-center gap-1">
-            <Heart className="w-3 h-3" />
-            Feito com carinho para você
-          </p>
-        )}
-      </div>
-    </aside>
+    <UserProvider userId={userGuid} isLoggedIn={isLoggedIn}>
+      <InnerAppContent />
+    </UserProvider>
   );
-};
+}
 
-export default EditSidebar;
+function InnerAppContent() {
+  const { isLoggedIn, userGuid, userRole, logout } = useAuth();
+  const { user, loadingUser } = useUser();
+
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-screen text-primary-dark font-accent text-lg">
+        Carregando informações do usuário...
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {isLoggedIn && user && (
+        <UserNavbar
+          userName={user.nomeCompleto}
+          userAvatar={import.meta.env.VITE_API_SERVER_URL + user.fotoDePerfil}
+          onLogout={logout}
+          userGuid={user.guid}
+        />
+      )}
+      <main className="flex-1">
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/usuario/criar-conta" element={<RegisterStepper />} />
+
+            {/* Rotas Protegidas */}
+            {isLoggedIn ? (
+              <>
+                <Route
+                  path="/usuario/meu-perfil/:guid"
+                  element={<UserProfile />}
+                />
+                <Route path="/usuario/meu-perfil/alterar-dados/:guid" element={<UserEditProfile />} />
+              </>
+            ) : (
+              <Route path="*" element={<Login />} />
+            )}
+
+            <Route path="/404" element={<NotFoundPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </ErrorBoundary>
+      </main>
+    </div>
+  );
+}
+
+export default App;

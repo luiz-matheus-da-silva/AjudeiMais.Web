@@ -32,6 +32,7 @@ export default function RegisterStep2({
       <div className="space-y-5">
         {/* Campo CEP */}
         <FormField
+        label="CEP"
           id="CEP"
           name="CEP"
           type="text"
@@ -59,6 +60,7 @@ export default function RegisterStep2({
         {/* Div para Rua e Número */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
+          label={"Rua/Avenida"}
             id="Rua"
             name="Rua"
             type="text"
@@ -71,6 +73,7 @@ export default function RegisterStep2({
             className="bg-customGray-200"
           />
           <FormField
+          label="Número"
             id="Numero"
             name="Numero"
             type="number"
@@ -84,6 +87,7 @@ export default function RegisterStep2({
 
         {/* Campo Complemento */}
         <FormField
+          label="Complemento (Opcional)"
           id="Complemento"
           name="Complemento"
           type="text"
@@ -97,6 +101,7 @@ export default function RegisterStep2({
         {/* Div para Bairro e Cidade */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
+            label="Bairro"
             id="Bairro"
             name="Bairro"
             type="text"
@@ -108,6 +113,7 @@ export default function RegisterStep2({
             className="bg-customGray-200"
           />
           <FormField
+            label="Cidade"
             id="Cidade"
             name="Cidade"
             type="text"
@@ -122,6 +128,7 @@ export default function RegisterStep2({
 
         {/* Campo Estado */}
         <FormField
+          label="Estado"
           id="Estado"
           name="Estado"
           type="text"

@@ -87,7 +87,7 @@ const UserNavbar = ({ userName, userAvatar, userGuid, onLogout }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    to="/perfil/editar"
+                    to={`/usuario/meu-perfil/alterar-dados/${userGuid}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-sm text-customGray-700 hover:bg-customGray-100 cursor-pointer"
                   >
                     <Settings size={18} />
